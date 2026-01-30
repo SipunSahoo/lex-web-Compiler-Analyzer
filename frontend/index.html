@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lex Compiler Online</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Background animation -->
+    <div class="background-animation">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-code"></i>
+                    <h1>Lex Compiler</h1>
+                </div>
+                <p class="subtitle">Compile and Execute Lex Programs Online</p>
+                <div class="header-badges">
+                    <span class="badge"><i class="fas fa-bolt"></i> Fast Compilation</span>
+                    <span class="badge"><i class="fas fa-shield-alt"></i> Secure Execution</span>
+                    <span class="badge"><i class="fas fa-cloud"></i> Cloud Powered</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-book"></i> Quick Actions</h3>
+                    <button type="button" class="sidebar-btn" id="loadExample">
+                        <i class="fas fa-file-code"></i> Load Example
+                    </button>
+                    <button type="button" class="sidebar-btn" id="clearAll">
+                        <i class="fas fa-trash-alt"></i> Clear All
+                    </button>
+                    <button type="button" class="sidebar-btn" id="downloadCode">
+                        <i class="fas fa-download"></i> Download Code
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-lightbulb"></i> Tips</h3>
+                    <div class="tip-card">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Start with the example to understand Lex syntax</p>
+                    </div>
+                    <div class="tip-card">
+                        <i class="fas fa-check-circle"></i>
+                        <p>Always include main() and yywrap() functions</p>
+                    </div>
+                    <div class="tip-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Check syntax carefully before compiling</p>
+                    </div>
+                </div>
+
+                <div class="sidebar-section server-status">
+                    <h3><i class="fas fa-server"></i> Server Status</h3>
+                    <div class="status-indicator" id="serverStatus">
+                        <div class="status-dot"></div>
+                        <span>Checking...</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <!-- Code Editor Panel -->
+                <div class="editor-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-code"></i>
+                            <h3>Lex Source Code</h3>
+                        </div>
+                        <div class="panel-tools">
+                            <button type="button" class="tool-btn" id="formatCode" title="Format Code">
+                                <i class="fas fa-align-left"></i>
+                            </button>
+                            <button type="button" class="tool-btn" id="copyCode" title="Copy Code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <span class="line-count" id="lineCount">Lines: 0</span>
+                        </div>
+                    </div>
+                    <div class="editor-wrapper">
+                        <div class="line-numbers" id="lineNumbers">1</div>
+                        <textarea id="lexCode" spellcheck="false" placeholder="// Write your Lex code here...
+
+%{
+#include <stdio.h>
+%}
+
+%%
+/* Your rules here */
+%%
+
+int yywrap() { return 1; }
+int main() { 
+    yylex(); 
+    return 0; 
+}"></textarea>
+                    </div>
+                </div>
+
+                <!-- Input Panel -->
+                <div class="editor-panel input-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-keyboard"></i>
+                            <h3>Test Input</h3>
+                        </div>
+                        <div class="panel-tools">
+                            <button type="button" class="tool-btn" id="clearInput" title="Clear Input">
+                                <i class="fas fa-eraser"></i>
+                            </button>
+                            <button type="button" class="tool-btn" id="pasteInput" title="Paste">
+                                <i class="fas fa-paste"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="inputText" spellcheck="false" placeholder="Enter test input here...
+
+Example:
+Hello World 123
+Test input for lexical analysis"></textarea>
+                </div>
+
+                <!-- Control Bar -->
+                <div class="control-bar">
+                    <button type="button" class="btn-run" id="compileBtn">
+                        <i class="fas fa-play"></i>
+                        <span>Compile & Run</span>
+                    </button>
+                    <button type="button" class="btn-stop" id="stopBtn" style="display: none;">
+                        <i class="fas fa-stop"></i>
+                        <span>Stop</span>
+                    </button>
+                    <div class="compilation-status" id="status"></div>
+                </div>
+
+                <!-- Output Panel -->
+                <div class="output-panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-terminal"></i>
+                            <h3>Output Console</h3>
+                        </div>
+                        <div class="panel-tools">
+                            <button type="button" class="tool-btn" id="clearOutput" title="Clear Output">
+                                <i class="fas fa-broom"></i>
+                            </button>
+                            <button type="button" class="tool-btn" id="copyOutput" title="Copy Output">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button type="button" class="tool-btn" id="downloadOutput" title="Download Output">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="output-wrapper">
+                        <pre id="output"><span class="output-placeholder"><i class="fas fa-info-circle"></i> Output will appear here after compilation...</span></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p><i class="fas fa-code"></i> Built with Flex & GCC</p>
+                </div>
+                <div class="footer-right">
+                    <p>Made with <i class="fas fa-heart"></i> for Compiler Design Students</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
