@@ -1,5 +1,7 @@
-const API_URL = 'http://localhost:3000'; // Target local node service
-
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3000' 
+    : 'https://lex-web-compiler-analyzer.onrender.com';
+    
 const exampleLexCode = `%{
 #include <stdio.h>
 %}
