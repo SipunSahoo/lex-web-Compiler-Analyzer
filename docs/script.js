@@ -1,14 +1,18 @@
+// 1. Dynamic Environment Routing
+// This checks if you are running Live Server locally or viewing via GitHub Pages
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000' 
     : 'https://lex-web-compiler-analyzer.onrender.com';
-    
-const exampleLexCode = `%{
+
+// 2. The Simple Example Code (No File I/O)
+// This serves as BOTH our placeholder and our Load Example template
+const simpleLexCode = `%{
 #include <stdio.h>
 %}
 
 %%
-[0-9]+      { printf("Terminal -> Found Number: %s\\n", yytext); fprintf(yyout, "Disk -> Number Saved: %s\\n", yytext); }
-[a-zA-Z]+   { printf("Terminal -> Found Word: %s\\n", yytext); fprintf(yyout, "Disk -> Word Saved: %s\\n", yytext); }
+[0-9]+      { printf("Terminal -> Found Number: %s\\n", yytext); }
+[a-zA-Z]+   { printf("Terminal -> Found Word: %s\\n", yytext); }
 [ \\t\\n]+  { /* Ignore whitespace */ }
 .           { printf("Unknown: %s\\n", yytext); }
 %%
@@ -16,20 +20,8 @@ const exampleLexCode = `%{
 int yywrap() { return 1; }
 
 int main() {
-    yyin = fopen("input.txt", "r");
-    yyout = fopen("output.txt", "w");
-
-    // Symmetrical validation. The file is guaranteed to exist by our backend!
-    if (!yyin) {
-        printf("WARNING: input.txt not found! Falling back to standard input.\\n");
-    }
-    
-    printf("--- Lexical Analysis Started ---\\n");
+    printf("--- Simple Lexical Analysis Started ---\\n");
     yylex();
-    
-    if (yyin) fclose(yyin);
-    if (yyout) fclose(yyout);
-    
     printf("--- Execution Finished ---\\n");
     return 0;
 }`;
@@ -44,17 +36,32 @@ window.addEventListener('DOMContentLoaded', function() {
     const lineNumbers = document.getElementById('lineNumbers');
     const lineCount = document.getElementById('lineCount');
     
+    // --- INITIALIZATION ---
+    // Set the simple code as a "ghost" placeholder.
+    lexCodeArea.value = ''; 
+    lexCodeArea.placeholder = simpleLexCode;
+    
+    stdInArea.value = '';
+    stdInArea.placeholder = "Hello World 2026\nTesting terminal input 123";
+    
     function updateLineNumbers() {
+        // If the editor is empty, split('\n') returns an array of length 1.
         const lines = lexCodeArea.value.split('\n').length;
         lineNumbers.textContent = Array.from({ length: lines }, (_, i) => i + 1).join('\n');
         if (lineCount) lineCount.textContent = 'Lines: ' + lines;
     }
     
+    // Trigger line numbers calculation on load
+    updateLineNumbers();
+    
+    // --- EVENT LISTENERS ---
+    
+    // Load Example now correctly brings in the SIMPLE code (no files)
     document.getElementById('loadExample').addEventListener('click', function(e) {
         e.preventDefault();
-        lexCodeArea.value = exampleLexCode;
-        stdInArea.value = "Terminal Input Data 123";
-        fileInArea.value = "File Input Data 456";
+        lexCodeArea.value = simpleLexCode;
+        stdInArea.value = "Terminal Input Data 123\nHello World!";
+        fileInArea.value = ""; // Explicitly keeping file input empty
         updateLineNumbers();
         showToast('Example loaded!', 'success');
     });
@@ -98,7 +105,8 @@ window.addEventListener('DOMContentLoaded', function() {
     
     document.getElementById('copyCode').addEventListener('click', function(e) {
         e.preventDefault(); 
-        navigator.clipboard.writeText(lexCodeArea.value); 
+        document.execCommand('copy'); // Fallback for iFrame safety
+        navigator.clipboard.writeText(lexCodeArea.value).catch(()=> /* ignore */{}); 
         showToast('Code copied!', 'success');
     });
 
@@ -131,6 +139,8 @@ window.addEventListener('DOMContentLoaded', function() {
         const stdInText = stdInArea.value; 
         const fileInputText = fileInArea.value; 
         
+        // Logical check: If the user just looks at the placeholder but doesn't type
+        // anything, `lexCode` will be empty. This prevents them from sending an empty request.
         if (!lexCode) { 
             showToast('Please enter Lex code', 'error'); 
             return; 
@@ -182,7 +192,7 @@ window.addEventListener('DOMContentLoaded', function() {
     
     lexCodeArea.addEventListener('input', updateLineNumbers);
     lexCodeArea.addEventListener('scroll', () => lineNumbers.scrollTop = lexCodeArea.scrollTop);
-    updateLineNumbers(); 
+    
     checkServerHealth();
 });
 
